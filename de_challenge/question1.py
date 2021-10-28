@@ -7,6 +7,7 @@ format (11 digits and matchable to the format in tab ndc)
 '''
 
 import pandas as pd
+from pathlib import Path
 from pandas import DataFrame
 from de_challenge.settings import Config
 
@@ -22,14 +23,15 @@ def get_dataframe_from_xlsx(sheet_name: str, **kwargs) -> DataFrame:
     Returns:
         DataFrame: The data imported as a pandas dataframe
     """
-    input_data_file = f'{Config.INPUT_DATA_PATH}/{Config.INPUT_DATA}'
+    input_data_file = f'{Config.INPUT_DATA_PATH}/{Config.INPUT_DATA_FILE}'
 
     # Create an empty dataframe
     df = pd.DataFrame()
 
     try:
         if kwargs.get('header'):
-           df = pd.read_excel(open(input_data_file, 'rb'), sheet_name=sheet_name, index_col=None, header=None, names=[sheet_name])
+            df = pd.read_excel(open(input_data_file, 'rb'), sheet_name=sheet_name, index_col=None, header=None,
+                               names=[sheet_name])
         else:
             df = pd.read_excel(open(input_data_file, 'rb'), sheet_name=sheet_name)
     except ValueError:
@@ -63,11 +65,17 @@ def get_normalize_med_data(df: DataFrame) -> DataFrame:
     2           70400           5/10/16
     2           70219           5/10/16
     """
-    _columns= {'Patient_ID': 'str', 'Diagnosis_Code': 'str', 'Service_Date': 'str'}
+    _columns = {
+        'Patient_ID': 'str',
+        'Diagnosis_Code': 'str',
+        'Service_Date': 'str',
+        'Med_Amount_Paid': 'str',
+        'Med_Amount_Billed': 'str'
+    }
     norm_df = pd.DataFrame({c: pd.Series(dtype=t) for c, t in _columns.items()})
 
     for dc in ['Diagnosis_Code_1', 'Diagnosis_Code_2', 'Diagnosis_Code_3', 'Diagnosis_Code_4']:
-        bf = df[['Patient_ID', dc, 'Service_Date']]
+        bf = df[['Patient_ID', dc, 'Service_Date', 'Amount_Paid', 'Amount_Billed']]
         bf.columns = _columns.keys()
         norm_df = norm_df.append(bf)
 
@@ -87,6 +95,14 @@ def normalize_ndc_data(ndc: str) -> str:
         str: Normalized NDC input string
     """
     return ndc.replace('-', '').zfill(11)
+
+
+def write_output_file(df: DataFrame) -> None:
+    # Create a directory to store the output file
+    Path(Config.OUTPUT_DATA_PATH).mkdir(parents=True, exist_ok=True)
+    file_path = f'{Config.OUTPUT_DATA_PATH}/{Config.OUTPUT_DATA_FILE}'
+
+    df.to_csv(file_path, index=False)
 
 
 def main():
@@ -115,17 +131,17 @@ def main():
     # 2. Merge medical records with diagnosis code to get all the
     # relevant patients with diagnosis code to Get patient with Condition Y
     cond_y_df = pd.merge(medical_data_sample_df, diagnosis_code_df, left_on='Diagnosis_Code', right_on='diagnosis_code')
+    cond_y_df = cond_y_df.drop(columns=['diagnosis_code'])
 
     # 3. Merge pharmacy records with NDC to get all patients who were given Drug X
     drug_x_df = pd.merge(pharmacy_data_sample_df, ndc_df, left_on='NDC', right_on='ndc')
+    drug_x_df = drug_x_df.drop(columns=['ndc'])
 
     # 4. Finally merge the #2 and #3 to get the list of all such patients
     res_df = pd.merge(cond_y_df, drug_x_df, left_on='Patient_ID', right_on='Patient_ID')
 
-    # 5. Get final patient list
-    patient_list = res_df.Patient_ID.drop_duplicates().values.tolist()
-
-    print(patient_list)
+    # 5. Finally writing the results into a CSV file
+    write_output_file(res_df)
 
 
 if __name__ == '__main__':
