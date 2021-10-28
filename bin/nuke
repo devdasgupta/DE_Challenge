@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+
+main() {
+  local prompt
+  prompt='This will remove all containers, images, and volumes for this project. '
+  prompt+='Are you sure? [y/N] '
+  read -r -p "$prompt"
+
+  [[ $REPLY = [Yy]* ]] || return
+  echo
+  docker-compose down --rmi all --volumes --remove-orphans "$@"
+}
+
+
+main "$@"
+
+
+# vim: ts=2 sw=2 sts=2 et

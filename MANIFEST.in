@@ -1,0 +1,21 @@
+include *.example
+include *.md
+include *.py
+include *.txt
+include *.yml
+include .isort.cfg
+include setup.cfg
+recursive-include bin *.chain
+recursive-include bin *.gz
+recursive-include bin *.md
+recursive-include bin *.pl
+recursive-include bin *.sh
+recursive-include bin *.sql
+recursive-include de_challenge *.py
+recursive-include de_challenge *.yaml
+recursive-include migrations *.ini
+recursive-include migrations *.mako
+recursive-include migrations *.py
+recursive-include migrations *.sql
+recursive-include requirements *.txt
+recursive-include tests *.py

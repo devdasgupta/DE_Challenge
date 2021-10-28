@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+
+SERVICE_HOSTNAME='de-challenge'
+
+
+main() {
+  docker-compose exec "$SERVICE_HOSTNAME" "$@"
+}
+
+
+main "$@"
+
+
+# vim: ts=2 sw=2 sts=2 et

@@ -1,0 +1,43 @@
+version: "3.5"
+
+volumes:
+  db:
+  localstack:
+
+services:
+  de-challenge:
+    build:
+      context: .
+      target: dev
+    user: user
+    tty: true
+    container_name: de-challenge
+    restart: unless-stopped
+    volumes:
+      - .:/srv
+    env_file:
+      - .env
+    links:
+      - localstack:s3
+    networks:
+      - coding
+  localstack:
+    container_name: de-challenge-localstack
+    restart: unless-stopped
+    image: localstack/localstack:latest
+    volumes:
+      - localstack:/tmp/localstack
+    environment:
+      - SERVICES=lambda,s3
+      - EDGE_PORT=4566
+      - AWS_DEFAULT_REGION=us-west-2
+      - DATA_DIR=/tmp/localstack/data
+    ports:
+      - '4566-4583:4566-4583'
+    networks:
+      - coding
+
+networks:
+  coding:
+    external: true
+# vim: ts=2 sw=2 sts=2 et

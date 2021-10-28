@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+
+SERVICE_MODULE='de_challenge'
+SERVICE_HOSTNAME='de-challenge'
+SERVICE_NETWORK='syapse'
+
+
+main() {
+  local prompt
+  prompt='This will set the environment up from scratch. '
+  prompt+='Are you sure? [y/n] '
+  read -r -p "$prompt"
+  [[ $REPLY = [Yy]* ]] || return
+
+  echo
+  read -r -p 'Do you want to replace current .env with .env.example as well? [y/n] '
+  echo
+  if [[ $REPLY = [Yy]* ]]
+  then
+    echo 'Copying .env.example to .env...'
+    cp .env.example .env
+  fi
+
+  echo
+  echo 'Rebuilding containers...'
+  docker compose down -v --remove-orphans
+  docker compose up -d --build
+
+}
+
+
+main "$@"
