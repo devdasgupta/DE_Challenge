@@ -93,3 +93,29 @@ in the backend database. How do you go about designing a warehouse storing infor
 from both sources? What aspects would you consider in this design?
 ```
 ### Solution:
+Whenever, a user who is also a product user is accessing our application, we get following information:
+- Name
+- Email
+
+Along with that we can also get the following information using reverse DNS:
+- Latitude
+- Longitude
+- Source
+
+Using these information we can deduce, the logic on how the users might be the same user and can have multiple aliases.
+
+The database representation for the same is provided below
+![Short_Q_1](img/Short_Ques_1.png)
+
+From the table when the user first registers he/she will be added to the fact table.
+When the user access his record for the second time, we can insert its records in the Dimension table for Patient. However, for further processing it, we check if any match is found in the database. The database match can be calculated by relevance of his first name, last name, latitude and longitude. With these data we determine whether this person has any aliases or not. Then we maintain them in the alias table and the final fact table is updated with its alias ID.
+
+Hence, we maintain records for all the sources. In addition, we also maintain the source information from where we get the records to calculate the alias
+
+---
+### Short Question 2
+```
+If table A, column X has n rows with value J and table B, column Y has m rows with value J, then
+when we join A and B on X and Y, how many rows will the value J appear in, assuming both m and n are greater than zero?
+```
+### Solution:
