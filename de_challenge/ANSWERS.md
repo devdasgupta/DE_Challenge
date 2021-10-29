@@ -1,21 +1,20 @@
 # Answers
----
 ### Question 1
 ```
 The claims data comes with duplicates and NDCs are messy.
 Please write a script to de- deduplicate the data
-(Note:rows identical to each other in every single column is considered duplicate)
-and clean the NDC into standard format (11 digits and matchable
-to the format in tab ndc)
+(Note: rows identical to each other in every single column is considered duplicate)
+and clean the NDC into a standard format (11 digits and matchable
+to the format in tab NDC)
 ```
-###Solution:
-The test solution for processing the data and get the resultant patients is provided in [question1.py](https://github.com/devdasgupta/DE_Challenge/blob/initial-setup/de_challenge/question1.py)
+### Solution:
+The test solution for processing the data and getting the resultant patients is provided in [question1.py](https://github.com/devdasgupta/DE_Challenge/blob/initial-setup/de_challenge/question1.py)
 
-* The de-duplication logic after reading the data into pandas dataframe is provided [here](https://github.com/devdasgupta/DE_Challenge/blob/01e01c527a31dbaea83a57fed343e4e877a5eab2/de_challenge/question1.py#L15)
+* The de-duplication logic after reading the data into pandas data frame is provided [here](https://github.com/devdasgupta/DE_Challenge/blob/01e01c527a31dbaea83a57fed343e4e877a5eab2/de_challenge/question1.py#L15)
 * Cleaning/Normalizing the NDC records is provided [here](https://github.com/devdasgupta/DE_Challenge/blob/01e01c527a31dbaea83a57fed343e4e877a5eab2/de_challenge/question1.py#L86)
-* The solution also provides the final patients list as a CSV format and is saved in the location [output_data](https://github.com/devdasgupta/DE_Challenge/blob/initial-setup/de_challenge/output_data/patients.csv)
+* The solution also provides the final patient list as a CSV format and is saved in the location [output_data](https://github.com/devdasgupta/DE_Challenge/blob/initial-setup/de_challenge/output_data/patients.csv)
 
-
+---
 ### Question 2
 ```
 In production, we deal with data at scale ingested from various data sources.
@@ -25,9 +24,53 @@ operation-able as you can. Feel free to start high-level, zoom into one data
 field, e.g. NDC, and flesh it out to show how you would design it, using it as
 an example.
 ```
-###Solution:
-While dealing with production and using a large scale data my first assumption is that we won't be getting the data in excel.
-Instead these would be varied data coming from various sources with varied data format.
-For diving into the solution I propose the following flow for the data ingestion. The QA framework strategy will be applied in each of these layer to ensure data quality.
+### Solution:
+While dealing with production and using large-scale data my first assumption is that we won't be getting the data in excel.
+Instead, these would be varied data coming from various sources with varied data formats.
+For diving into the solution, I propose the following flow for the data ingestion. The QA framework strategy will be applied in each of these layers to ensure data quality.
 
-####Data Flow design
+#### Data Flow design
+Let's consider a typical Data Ingestion pipeline where there are several data sources from where we are getting these records. With the nature of the data also assume we are currently ingesting data as a batch stream and no real-time data are getting generated.
+![Data Flow](img/Data_Flow.png)
+On a bit higher level it would like the following:
+![Data Flow2](img/Data_Flow_2.png)
+- The data from several sources are emitting data in various formats. These data contain several data formats.
+- In the first step the data is staged as is from its source to the staging area. Data consumption for a huge volume of data can be handled with help of the pyspark job running in the EMR cluster. The raw data extract will be stored in a parquet format which can easily be read and fed downstream.
+- In the second step ETL process need to be run which would do the following steps in order:
+    - Read the data into a data frame and filter out all NULL values from the list
+    - Format all the values in their acceptable format (e.g. change ndc from xxxx-xxxx-xxxx to xxxxxxxxxxx or xxxxxxxx to 000xxxxxxxx)
+    - Filter out any invalid inputs (For e.g. medication date > current date)
+    - Finally, store each of these records in different tables in the Data Marts
+- Once the data records are stored in the Data Marts they are finally managed by MDM and sent to either Data Warehouse for OLAP transactions, and to Data Lake for any OLTP transactions
+
+#### Testing Framework
+The testing validation should be carried out for each layer of data movement to ensure the data consistencies.
+The testing data flow can be described as follows:
+![Data Flow_QA](img/Data_Flow_QA.png)
+- QA1: In this validation we need to ensure we are able to load all the records from source to destination. The main QA over here is to ensure we are not loosing any data. Hence the overall count from the source should match to that of destination.
+- QA2: This is the layer where we're validating the data transformation and filtering. The validation of this layer is depending upon the business rules which we need to apply and ensure those rules are implemented without any miss.
+    - Validate the date fields are in proper format and there are no invalid dates present
+    - Validate all NDC records are 11 digit characters with no special characters in them.
+    - Validate Amount Billed >= Amount Paid
+    - These tests would ensure the data is clean which are consumed.
+- QA3: Validate all the delta records are consumed by downstream data store or appropriate tables. The data mapping is consistent across all the tables where the data will be residing.
+- QA4: Validate all the delta records consumed for each run are added to the Data Warehouse and the data integrity is consistent across the tables. The tables here would either be designed with Start Schema or Snowflake schema. The test should ensure that newly added data can be viewed and accessed without any issues.
+
+**Test implementation**
+
+In order to achieve true CI/CD for the data pipeline deployment, one should run the tests as a part of the data pipeline, where the success of each tests (QA1, QA2 etc.) should open the gateway for the next layer of data pipeline.
+The data pipeline should break the flow of data consumption (ingestion -> transformation -> storage) in an event any of the tests are failed.
+
+The way this can be achieved is by designing the CI/CD tools (e.g. Airflow / Jenkins), to include the qa automation suite as a part of data pipeline execution. In case of failed tests scenarios the pipeline should not proceed with further execution. This ensures bad data are not fed into downstream data stores.
+
+**Note:** Apart from maintaining solid QA test framework, it is also advisable to maintain a CDM (Continuous Data Monitoring) piece into account. The objective of CDm is to get metrics at each layer. The metrics can be count of records or threshold and generate alerts in case there is a huge deviation on the daily or weekly volume of records the pipeline is processing daily.
+
+---
+### Question 3
+```
+Is your de-duplication script optimized for large-scale data? If not, how would you go about
+optimizing it? Please describe the algorithm step=by-step (pseudo-code is fine)
+```
+### Solution:
+The solution provided in the _question1.py_ uses **Pandas** for manipulation of the data. This approach works really good for certain volume of data. However, one limitation pandas have is that the speed it can process the data is dependent on the server it is running. It does not have the capability to run in distibuted cluster utilizing the cluster feature to break the data into small chunk and compute them in parallel.
+
