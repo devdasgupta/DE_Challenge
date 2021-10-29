@@ -119,3 +119,12 @@ If table A, column X has n rows with value J and table B, column Y has m rows wi
 when we join A and B on X and Y, how many rows will the value J appear in, assuming both m and n are greater than zero?
 ```
 ### Solution:
+The query for thhis cade would be as follows:
+```sql
+select * from
+table_A A
+join table_B B
+on A.X = B.Y
+where A.X = 'J'
+```
+In the above query the number of times J would come in the query would be the max(A.X.J, B.Y.J). That is the total number of occurrence for J would be the max occurrences of J in either of these columns.
