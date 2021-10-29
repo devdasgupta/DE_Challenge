@@ -96,7 +96,7 @@ def normalize_ndc_data(ndc: str) -> str:
     returns:
         str: Normalized NDC input string
     """
-    return ndc.replace('-', '').zfill(11)
+    return ndc.strip().replace('-', '').zfill(11)
 
 
 def write_output_file(df: DataFrame) -> None:

@@ -50,7 +50,7 @@ The testing data flow can be described as follows:
 - QA1: In this validation we need to ensure we are able to load all the records from source to destination. The main QA over here is to ensure we are not loosing any data. Hence the overall count from the source should match to that of destination.
 - QA2: This is the layer where we're validating the data transformation and filtering. The validation of this layer is depending upon the business rules which we need to apply and ensure those rules are implemented without any miss.
     - Validate the date fields are in proper format and there are no invalid dates present
-    - Validate all NDC records are 11 digit characters with no special characters in them.
+    - Validate all NDC records are 11 digit characters with no special characters in them. The example of such validation is provided [here](https://github.com/devdasgupta/DE_Challenge/blob/initial-setup/tests/test_question2_patient_output.py)
     - Validate Amount Billed >= Amount Paid
     - These tests would ensure the data is clean which are consumed.
 - QA3: Validate all the delta records are consumed by downstream data store or appropriate tables. The data mapping is consistent across all the tables where the data will be residing.
@@ -81,6 +81,7 @@ However, we have to be cognizant on how we are using the resources in master and
 The code for implementing the same using pyspark is provided in [question1_optimized.py](https://github.com/devdasgupta/DE_Challenge/blob/initial-setup/de_challenge/question1_optimized.py), with pyspark helper functions in [spark_utils.py](https://github.com/devdasgupta/DE_Challenge/blob/initial-setup/de_challenge/spark_utils.py).
 
 For this coding exercise purpose it is assumed that the data (medical_data_sample, pharmacy_data_sample etc.) will be available as CSV format as excel has a limitation of the data record count.
+**Note** The normalization for the medical records will follow the same logic as provided in question1.py and still incomplete.
 
 ---
 ### Short Question 1
