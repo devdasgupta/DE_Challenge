@@ -78,7 +78,7 @@ Hence, the solution for optimizing for large scale data is by utilizing the feat
 
 However, we have to be cognizant on how we are using the resources in master and worker nodes and assign resources
 (size of the EC2 instances xlarge, 4xlarge etc.) accordingly.
-The code for implementing the same using pyspark is provided in question1_optimized.py.
+The code for implementing the same using pyspark is provided in [question1_optimized.py](https://github.com/devdasgupta/DE_Challenge/blob/initial-setup/de_challenge/question1_optimized.py), with pyspark helper functions in [spark_utils.py](https://github.com/devdasgupta/DE_Challenge/blob/initial-setup/de_challenge/spark_utils.py).
 
 For this coding exercise purpose it is assumed that the data (medical_data_sample, pharmacy_data_sample etc.) will be available as CSV format as excel has a limitation of the data record count.
 
