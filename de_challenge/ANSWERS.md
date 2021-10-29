@@ -72,5 +72,24 @@ Is your de-duplication script optimized for large-scale data? If not, how would 
 optimizing it? Please describe the algorithm step=by-step (pseudo-code is fine)
 ```
 ### Solution:
-The solution provided in the _question1.py_ uses **Pandas** for manipulation of the data. This approach works really good for certain volume of data. However, one limitation pandas have is that the speed it can process the data is dependent on the server it is running. It does not have the capability to run in distibuted cluster utilizing the cluster feature to break the data into small chunk and compute them in parallel.
+The solution provided in the _question1.py_ uses **Pandas** for manipulation of the data. This approach works perfect for certain volume of data. However, one limitation pandas have is that the speed it can process the data is dependent on the server it is running. It does not have the capability to run in distributed cluster utilizing the cluster feature to break the data into small chunk and compute them in parallel.
 
+Hence, the solution for optimizing for large scale data is by utilizing the features for **pyspark** and run it in EMR cluster with parallel computation. Further scalability can be achieved by intelligent manipulation of the number of executors and data partition logic. This along with setting up number of worker nodes along with master node to carry out the operation at scale.
+
+However, we have to be cognizant on how we are using the resources in master and worker nodes and assign resources
+(size of the EC2 instances xlarge, 4xlarge etc.) accordingly.
+The code for implementing the same using pyspark is provided in question1_optimized.py.
+
+For this coding exercise purpose it is assumed that the data (medical_data_sample, pharmacy_data_sample etc.) will be available as CSV format as excel has a limitation of the data record count.
+
+---
+### Short Question 1
+```
+There are often multiple sources of truth depending on where the information is from.
+For example, the chat bot on our website records inquirer’s name, email and a
+short message. In the scenario where the inquirer is also a product user, the email
+reported on the chat bot might or might not fully agree with the record of that user
+in the backend database. How do you go about designing a warehouse storing information
+from both sources? What aspects would you consider in this design?
+```
+### Solution:

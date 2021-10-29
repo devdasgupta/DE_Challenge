@@ -43,7 +43,7 @@ def get_dataframe_from_xlsx(sheet_name: str, **kwargs) -> DataFrame:
 
 def get_normalize_med_data(df: DataFrame) -> DataFrame:
     """
-    This function normalizes the medical data records by unnesting the
+    This function normalizes the medical data records by un-nesting the
     diagnosis records into one column and return the resultant records
 
     Args:
@@ -106,7 +106,7 @@ def write_output_file(df: DataFrame) -> None:
 
 
 def main():
-    # 1. The first step of the algorith is to read the data into pandas dataframe and normalize it.
+    # 1. The first step of the algorithm is to read the data into pandas dataframe and normalize it.
     # 1.a. Read records for medical_data_sample and remove duplicate
     medical_data_sample_df = get_dataframe_from_xlsx('medical_data_sample')
 
@@ -119,7 +119,7 @@ def main():
     # 1.d. Normalize the ndc data in pharmacy to the acceptable format
     pharmacy_data_sample_df['NDC'] = pharmacy_data_sample_df['NDC'].apply(normalize_ndc_data)
 
-    # 1.e. Read records for NDC and remove dupllicates
+    # 1.e. Read records for NDC and remove duplicates
     ndc_df = get_dataframe_from_xlsx('ndc', header=True)
 
     # 1.f. Normalize the data for NDC records
