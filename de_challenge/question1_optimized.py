@@ -1,10 +1,9 @@
-from pyspark.sql.types import StringType
-from pyspark.sql.functions import udf, col
 from pyspark.sql import DataFrame, SparkSession
+from pyspark.sql.functions import col, udf
+from pyspark.sql.types import StringType
 
 from de_challenge.question1 import normalize_ndc_data
 from de_challenge.settings import Config
-
 from de_challenge.spark_utils import ReadWriteUtils
 
 udf_normalize_ndc = udf(lambda x: normalize_ndc_data(x), StringType())

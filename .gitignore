@@ -122,3 +122,5 @@ target/
 .mr.developer.cfg
 .project
 .pydevproject
+
+.vscode

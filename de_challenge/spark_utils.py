@@ -3,6 +3,7 @@ from typing import NoReturn, Optional
 
 from pyspark.sql import DataFrame
 from pyspark.sql.utils import AnalysisException
+
 from de_challenge.settings import Config
 
 

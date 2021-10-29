@@ -6,9 +6,11 @@ in every single column is considered duplicate) and clean the NDC into standard
 format (11 digits and matchable to the format in tab ndc)
 '''
 
-import pandas as pd
 from pathlib import Path
+
+import pandas as pd
 from pandas import DataFrame
+
 from de_challenge.settings import Config
 
 
